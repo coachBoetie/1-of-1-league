@@ -1,3 +1,4 @@
+console.log("🔥 script loaded");
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore,
@@ -13,9 +14,9 @@ import {
 
 // 🔥 YOUR CONFIG
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
+  apiKey: "AIzaSyAvmq-HKsv64UOBQUmIVXeIOdm_bdwhzwk",
+  authDomain: "f-1-league.firebaseapp.com",
+  projectId: "f-1-league",
 };
 
 const app = initializeApp(firebaseConfig);

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>1 OF 1 LEAGUE</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1 class="title">1 OF 1 LEAGUE</h1>
+
+  <!-- ADD PLAYER -->
+  <div class="card">
+    <h2>Add Player</h2>
+    <input id="firstName" placeholder="First Name">
+    <input id="lastName" placeholder="Surname">
+    <button onclick="addPlayer()">Add Player</button>
+  </div>
+
+  <!-- CREATE MATCH -->
+  <div class="card">
+    <h2>Create Match</h2>
+
+    <select id="player1"></select>
+    <select id="player2"></select>
+
+    <input id="score1" type="number" placeholder="Player 1 Score">
+    <input id="score2" type="number" placeholder="Player 2 Score">
+
+    <button onclick="addMatch()">Save Match</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card">
+    <h2>League Table</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Pos</th>
+          <th>Player</th>
+          <th>W</th>
+          <th>L</th>
+          <th>Pts</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- MATCHES -->
+  <div class="card">
+    <h2>Matches</h2>
+    <div id="matches"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

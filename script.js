@@ -7,7 +7,7 @@ import {
   onSnapshot,
   doc,
   updateDoc,
-  getDoc,
+  getDocs,
   query,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
@@ -56,7 +56,10 @@ window.addMatch = async function () {
   const s1 = parseInt(document.getElementById("score1").value);
   const s2 = parseInt(document.getElementById("score2").value);
 
-if (p1Name === p2Name)
+if (!p1Name || !p2Name || isNaN(s1) || isNaN(s2))
+    return alert("Fill everything");
+
+  if (p1Name === p2Name)
   return alert("A player cannot play against themselves");
 
   const p1Win = s1 > s2;
@@ -73,10 +76,7 @@ if (p1Name === p2Name)
     p1Points = 0;
   }
 
-  if (!p1Name || !p2Name || isNaN(s1) || isNaN(s2))
-    return alert("Fill everything");
-
-  const playersSnap = await new Promise(res => onSnapshot(playersRef, res));
+  const playersSnap = await getDocs(playersRef);
 
   let p1, p2;
 

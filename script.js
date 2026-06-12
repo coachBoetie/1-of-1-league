@@ -25,7 +25,6 @@ const db = getFirestore(app);
 const playersRef = collection(db, "players");
 const matchesRef = collection(db, "matches");
 
-const K = 32;
 
 // =======================
 // ADD PLAYER (now uses ELO)
@@ -38,7 +37,7 @@ window.addPlayer = async function () {
 
   await addDoc(playersRef, {
     name: `${first} ${last}`,
-    elo: 1000,
+    points: 0,
     wins: 0,
     losses: 0,
     createdAt: Date.now()
@@ -49,13 +48,6 @@ window.addPlayer = async function () {
 };
 
 // =======================
-// ELO CALCULATION
-// =======================
-function expectedScore(r1, r2) {
-  return 1 / (1 + Math.pow(10, (r2 - r1) / 400));
-}
-
-// =======================
 // ADD MATCH (PRO VERSION)
 // =======================
 window.addMatch = async function () {
@@ -64,12 +56,27 @@ window.addMatch = async function () {
   const s1 = parseInt(document.getElementById("score1").value);
   const s2 = parseInt(document.getElementById("score2").value);
 
+if (p1Name === p2Name)
+  return alert("A player cannot play against themselves");
+
+  const p1Win = s1 > s2;
+  const margin = Math.abs(s1 - s2);
+
+  let p1Points = 0;
+  let p2Points = 0;
+
+  if (p1Win) {
+    p1Points = 3 + (margin >= 5 ? 1 : 0);
+    p2Points = 0;
+  } else {
+    p2Points = 3 + (margin >= 5 ? 1 :0);
+    p1Points = 0;
+  }
+
   if (!p1Name || !p2Name || isNaN(s1) || isNaN(s2))
     return alert("Fill everything");
 
-  const playersSnap = await new Promise(res =>
-    onSnapshot(playersRef, res)
-  );
+  const playersSnap = await new Promise(res => onSnapshot(playersRef, res));
 
   let p1, p2;
 
@@ -78,25 +85,20 @@ window.addMatch = async function () {
     if (d.data().name === p2Name) p2 = { id: d.id, ...d.data() };
   });
 
-  const p1Win = s1 > s2;
-
-  const exp1 = expectedScore(p1.elo, p2.elo);
-  const exp2 = expectedScore(p2.elo, p1.elo);
-
-  const newElo1 = Math.round(p1.elo + K * ((p1Win ? 1 : 0) - exp1));
-  const newElo2 = Math.round(p2.elo + K * ((p1Win ? 0 : 1) - exp2));
-
+  //UPDATE PLAYER 1
   await updateDoc(doc(db, "players", p1.id), {
-    elo: newElo1,
+    points: (p1.points || 0) + p1Points,
     wins: p1.wins + (p1Win ? 1 : 0),
     losses: p1.losses + (p1Win ? 0 : 1)
-  });
+});
 
-  await updateDoc(doc(db, "players", p2.id), {
-    elo: newElo2,
+//UPDATE PLAYER 2
+await updateDoc(doc(db, "players", p2.id), {
+    points: (p2.points || 0) + p2Points,
     wins: p2.wins + (p1Win ? 0 : 1),
     losses: p2.losses + (p1Win ? 1 : 0)
-  });
+});
+
 
   await addDoc(matchesRef, {
     player1: p1Name,
@@ -126,7 +128,7 @@ onSnapshot(playersRef, (snapshot) => {
     players.push({ id: docSnap.id, ...docSnap.data() });
   });
 
-  players.sort((a, b) => b.elo - a.elo);
+  players.sort((a, b) => (b.points || 0) - (a.points || 0));
 
   players.forEach((p, i) => {
     const opt = `<option value="${p.name}">${p.name}</option>`;
@@ -139,7 +141,7 @@ onSnapshot(playersRef, (snapshot) => {
         <td>${p.name}</td>
         <td>${p.wins}</td>
         <td>${p.losses}</td>
-        <td>${p.elo}</td>
+        <td>${p.points || 0}</td>
       </tr>
     `;
   });
